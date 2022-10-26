@@ -17,6 +17,7 @@ import Logger from 'chegs-simple-logger';
  * @property {String} tempLocation - The local dir to save temporary information for Auto Git Update.
  * @property {Array[String]} ignoreFiles - An array of files to not install when updating. Useful for config files. 
  * @property {String} executeOnComplete - A command to execute after an update completes. Good for restarting the app.
+ * @property {Boolean} installDependencies - run npm i after update.
  * @property {Boolean} exitOnComplete - Use process exit to stop the app after a successful update.
  */
 
@@ -33,7 +34,7 @@ const testing = false;
 // Create a new simple logger. This can be updated to use a new configuration by calling setLogConfig()
 // https://github.com/chegele/Logger
 let log = new Logger({});
-log.logGeneral = true;
+log.logGeneral = false;
 log.logWarning = true;
 log.logError   = true;
 log.logDetail  = false;
@@ -122,7 +123,7 @@ export default class AutoGitUpdate {
             await downloadUpdate();
             await backupApp();
             await installUpdate();
-            await installDependencies();
+            if (config.installDependencies) await installDependencies();
             log.general('Auto Git Update - Finished installing updated version.');
             if (config.executeOnComplete) await promiseBlindExecute(config.executeOnComplete);
             if (config.exitOnComplete) process.exit(1);
